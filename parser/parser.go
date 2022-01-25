@@ -16,8 +16,21 @@ const (
 	SUM         // +
 	PRODUCT     // *
 	PREFIX      // -X or !X
-	CALL
+	CALL        // ex) add(2, 3)
 )
+
+// priority orders for infix parser
+var precedences = map[token.TokenType]int{
+	token.EQ:       EQUALS,
+	token.NOT_EQ:   EQUALS,
+	token.LT:       LESSGREATER,
+	token.GT:       LESSGREATER,
+	token.PLUS:     SUM,
+	token.MINUS:    SUM,
+	token.SLASH:    PRODUCT,
+	token.ASTERISK: PRODUCT,
+	token.LPAREN:   CALL,
+}
 
 type Parser struct {
 	l      *lexer.Lexer
@@ -72,6 +85,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
+	p.registerInfix(token.LPAREN, p.parseCallExpression)
 
 	// setup tokens
 	p.nextToken() // for current
@@ -82,6 +96,47 @@ func New(l *lexer.Lexer) *Parser {
 
 func (p *Parser) Errors() []string {
 	return p.errors
+}
+
+///
+/// for call expression
+///
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	exp := &ast.CallExpression{Token: p.curToken, Function: function}
+	exp.Arguments = p.parseCallArguments()
+	return exp
+}
+
+///
+/// for call arguments
+///
+func (p *Parser) parseCallArguments() []ast.Expression {
+	args := []ast.Expression{}
+
+	if p.peekTokenIs(token.RPAREN) {
+		// no args case
+		p.nextToken()
+		return args
+	}
+
+	p.nextToken() // skip ')'
+
+	// first arg
+	args = append(args, p.parseExpression(LOWEST))
+
+	// second... args
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken() // skip prev arg
+		p.nextToken() // skip ','
+		args = append(args, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(token.RPAREN) {
+		// invalid syntax
+		return nil
+	}
+
+	return args
 }
 
 ///
@@ -402,17 +457,6 @@ func (p *Parser) registerInfix(
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	msg := fmt.Sprintf("no prefix parse function for %s found", t)
 	p.errors = append(p.errors, msg)
-}
-
-var precedences = map[token.TokenType]int{
-	token.EQ:       EQUALS,
-	token.NOT_EQ:   EQUALS,
-	token.LT:       LESSGREATER,
-	token.GT:       LESSGREATER,
-	token.PLUS:     SUM,
-	token.MINUS:    SUM,
-	token.SLASH:    PRODUCT,
-	token.ASTERISK: PRODUCT,
 }
 
 func (p *Parser) peekPrecedence() int {
