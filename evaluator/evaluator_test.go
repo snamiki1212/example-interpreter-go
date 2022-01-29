@@ -51,6 +51,10 @@ func TestEvalIntegerExpression(t *testing.T) {
 	}{
 		{"5", 5},
 		{"10", 10},
+
+		// minus
+		{"-5", -5},
+		{"-10", -10},
 	}
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
