@@ -31,6 +31,7 @@ if ( 5 < 10 ) {
 "foobar"
 "foo bar"
 [1, 2];
+a * [1, 2, 3, 4][b * c] * d
 `
 
 	tests := []struct {
@@ -139,6 +140,26 @@ if ( 5 < 10 ) {
 		{token.INT, "2"},
 		{token.RBRACKET, "]"},
 		{token.SEMICOLON, ";"},
+
+		// Complicated Index a * [1, 2, 3, 4][b * c] * d
+		{token.IDENT, "a"},
+		{token.ASTERISK, "*"},
+		{token.LBRACKET, "["},
+		{token.INT, "1"},
+		{token.COMMA, ","},
+		{token.INT, "2"},
+		{token.COMMA, ","},
+		{token.INT, "3"},
+		{token.COMMA, ","},
+		{token.INT, "4"},
+		{token.RBRACKET, "]"},
+		{token.LBRACKET, "["},
+		{token.IDENT, "b"},
+		{token.ASTERISK, "*"},
+		{token.IDENT, "c"},
+		{token.RBRACKET, "]"},
+		{token.ASTERISK, "*"},
+		{token.IDENT, "d"},
 
 		// EOF
 		{token.EOF, ""},
