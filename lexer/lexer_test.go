@@ -32,6 +32,7 @@ if ( 5 < 10 ) {
 "foo bar"
 [1, 2];
 a * [1, 2, 3, 4][b * c] * d
+{"foo": "bar"}
 `
 
 	tests := []struct {
@@ -160,6 +161,13 @@ a * [1, 2, 3, 4][b * c] * d
 		{token.RBRACKET, "]"},
 		{token.ASTERISK, "*"},
 		{token.IDENT, "d"},
+
+		// for Dic
+		{token.LBRACE, "{"},
+		{token.STRING, "foo"},
+		{token.COLON, ":"},
+		{token.STRING, "bar"},
+		{token.RBRACE, "}"},
 
 		// EOF
 		{token.EOF, ""},

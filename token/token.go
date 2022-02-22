@@ -32,6 +32,7 @@ const (
 	// delimeter
 	COMMA     = ","
 	SEMICOLON = ";"
+	COLON     = ":"
 
 	// brunket
 	LPAREN   = "("
