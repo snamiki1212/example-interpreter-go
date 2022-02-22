@@ -3,6 +3,20 @@
 - [O'Reilly Japan - Go 言語でつくるインタプリタ](https://www.oreilly.co.jp/books/9784873118222/) のソースコード
 - グランドフィナーレまでの分
 
+## Getting Started
+
+```zsh
+# run
+$ go run main.go
+
+# test
+$ go test ./ast
+$ go test ./evaluator
+$ go test ./lexer
+$ go test ./object
+$ go test ./parser
+```
+
 ## MEMO
 
 ### 全体の流れ
